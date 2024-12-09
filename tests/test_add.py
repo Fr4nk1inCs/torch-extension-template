@@ -1,5 +1,6 @@
-import torch
 import extension
+import torch
+
 
 def test():
     a = torch.ones(1024, 1024).cuda()
@@ -7,6 +8,7 @@ def test():
     c = extension.add(a, b)
     assert torch.all(c == 2)
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     test()
-    print('Test passed')
+    print("Test passed")

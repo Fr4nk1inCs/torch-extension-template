@@ -23,39 +23,43 @@ set(CMAKE_CUDA_USE_RESPONSE_FILE_FOR_OBJECTS 0)
 cmake_policy(SET CMP0146 OLD)
 find_package(CUDA REQUIRED)
 include(FindCUDA/select_compute_arch)
-CUDA_DETECT_INSTALLED_GPUS(INSTALLED_GPU_ARCH)
+cuda_detect_installed_gpus(INSTALLED_GPU_ARCH)
 set(TORCH_CUDA_ARCH_LIST "${INSTALLED_GPU_ARCH}")
 include_directories(${CUDA_INCLUDE_DIRS})
 
 # find Python
-find_package(Python COMPONENTS Interpreter Development REQUIRED)
+find_package(
+  Python
+  COMPONENTS Interpreter Development
+  REQUIRED)
 get_target_property(PYTHON_INTERP Python::Interpreter LOCATION)
 message(STATUS "Using Python Interpreter: ${PYTHON_INTERP}")
 
 # find torch
-file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/find_torch.py FIND_TORCH_PY)
+file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/find_torch.py
+     FIND_TORCH_PY)
 execute_process(
   COMMAND ${PYTHON_INTERP} ${FIND_TORCH_PY}
   OUTPUT_VARIABLE TORCH_PREFIX_VER
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "find_torch.py output: ${TORCH_PREFIX_VER}")
 list(GET TORCH_PREFIX_VER 0 TORCH_PREFIX)
 list(GET TORCH_PREFIX_VER 1 TORCH_VER)
 message(STATUS "Configuring for PyTorch ${TORCH_VER}")
 list(APPEND CMAKE_PREFIX_PATH ${TORCH_PREFIX})
 find_package(Torch REQUIRED)
-find_library(TORCH_PYTHON_LIBRARY torch_python PATHS "${TORCH_INSTALL_PREFIX}/lib")
+find_library(TORCH_PYTHON_LIBRARY torch_python
+             PATHS "${TORCH_INSTALL_PREFIX}/lib")
 message(STATUS "TORCH_PYTHON_LIBRARY: ${TORCH_PYTHON_LIBRARY}")
 include_directories(${TORCH_INCLUDE_DIRS})
 
 # find pybind11
-file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/find_pybind11.py FIND_PYBIND_PY)
+file(TO_NATIVE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/scripts/find_pybind11.py
+     FIND_PYBIND_PY)
 execute_process(
   COMMAND ${PYTHON_INTERP} ${FIND_PYBIND_PY}
   OUTPUT_VARIABLE PYBIND_CMAKE_DIR
-  OUTPUT_STRIP_TRAILING_WHITESPACE
-)
+  OUTPUT_STRIP_TRAILING_WHITESPACE)
 message(STATUS "find_pybind11.py output: ${PYBIND_CMAKE_DIR}")
 set(pybind11_DIR ${PYBIND_CMAKE_DIR})
 find_package(pybind11 REQUIRED)
