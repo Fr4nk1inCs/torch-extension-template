@@ -1,10 +1,68 @@
 [project]
 name = "extension"
 version = "0.0.1"
-dependencies = ["torch", "pybind11"]
+dependencies = ["torch==2.7.0"]
 authors = [{ name = "Fr4nk1in", email = "fushen@mail.ustc.edu.cn" }]
 description = "Torch C++/CUDA Extension Template"
 
 [build-system]
-requires = ["scikit-build-core", "pybind11", "torch >= 2.0"]
+requires = ["scikit-build-core", "pybind11", "torch==2.7.0"]
 build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.source-dir = "."
+sdist.exclude = [".pixi"]
+wheel.install-dir = "extension"
+wheel.packages = ["python/extension"]
+build-dir = "build-pip/{wheel_tag}"
+
+# Pixi setup
+[tool.pixi.workspace]
+channels = ["conda-forge"]
+name = "extension"
+platforms = ["linux-64"]
+
+[tool.pixi.dependencies]
+# build
+cmake = ">=4.1.0,<5"
+make = ">=4.4.1,<5"
+ninja = ">=1.13.1,<2"
+
+cuda = "12.8.*"
+cxx-compiler = ">=1.11.0,<2"
+
+uv = ">=0.8.10,<0.9"
+scikit-build-core = ">=0.11.5,<0.12"
+pybind11 = ">=3.0.0,<4"
+numpy = ">=2.3.2,<3"
+
+# test
+pytest = ">=8.4.1,<9"
+
+# format
+black = ">=25.1.0,<26"
+clang-format = ">=20.1.8,<21"
+
+[tool.pixi.tasks]
+build = { cmd = ["uv", "build", "--no-build-isolation"] }
+local-install = { cmd = [
+  "uv",
+  "pip",
+  "install",
+  "-e",
+  ".",
+  "--no-build-isolation",
+], depends-on = [
+  "local-install",
+] }
+test = { cmd = ["pytest", "-v", "tests"], depends-on = ["local-install"] }
+fmt-py = { cmd = ["black", "."] }
+fmt-cxx = { cmd = [
+  "clang-format",
+  "-i",
+  "csrc/include/*.hh",
+  "csrc/include/*.cuh",
+  "csrc/lib/*.cc",
+  "csrc/lib/*.cu",
+] }
+fmt = [{ task = "fmt-py" }, { task = "fmt-cxx" }]

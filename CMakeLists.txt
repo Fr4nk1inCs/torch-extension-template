@@ -27,6 +27,7 @@ include(FindCUDA/select_compute_arch)
 cuda_detect_installed_gpus(INSTALLED_GPU_ARCH)
 set(TORCH_CUDA_ARCH_LIST "${INSTALLED_GPU_ARCH}")
 include_directories(${CUDA_INCLUDE_DIRS})
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -I${CUDA_INCLUDE_DIRS}")
 
 # find Python
 find_package(

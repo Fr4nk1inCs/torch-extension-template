@@ -2,6 +2,6 @@
 
 #include <torch/extension.h>
 
-namespace ext {
+namespace core {
 torch::Tensor add(const torch::Tensor &a, const torch::Tensor &b);
-} // namespace ext
+} // namespace core

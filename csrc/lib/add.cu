@@ -14,7 +14,7 @@ __global__ void add_kernel(const scalar_t *a, const scalar_t *b, scalar_t *c,
   }
 }
 
-Tensor ext::add(const Tensor &a, const Tensor &b) {
+Tensor core::add(const Tensor &a, const Tensor &b) {
   auto a_contig = a.contiguous();
   auto b_contig = b.contiguous();
   auto c = torch::empty_like(a);
